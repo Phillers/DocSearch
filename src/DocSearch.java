@@ -16,10 +16,9 @@ class GUI implements Runnable{
     private List<Document> documents;
     private JTable table = new JTable();
     private JTextArea content = new JTextArea();
-
+    JFrame frame = new JFrame("Document Search");
     @Override
     public void run() {
-        JFrame frame = new JFrame("Document Search");
         frame.setSize(1000, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new GridBagLayout());
@@ -114,13 +113,17 @@ class GUI implements Runnable{
     }
 
     private void getDatabase(String keywords, String documentFile) {
-        documents = new ArrayList<>(home.prepareDb(keywords, documentFile));
-        DefaultTableModel model = new DefaultTableModel();
-        model.addColumn("Document title");
-        for ( Document doc : documents) {
-            model.addRow(new Object[]{doc.title});
+        try {
+            documents = new ArrayList<>(home.prepareDb(keywords, documentFile));
+            DefaultTableModel model = new DefaultTableModel();
+            model.addColumn("Document title");
+            for (Document doc : documents) {
+                model.addRow(new Object[]{doc.title});
+            }
+            table.setModel(model);
+        } catch (FileNotFoundException e){
+            JOptionPane.showMessageDialog(frame, e.getMessage());
         }
-        table.setModel(model);
     }
 
 
@@ -170,7 +173,7 @@ class DocSearch {
     }
 
 
-    Vector<Document> prepareDb(String keyFile, String docFile) {
+    Vector<Document> prepareDb(String keyFile, String docFile) throws FileNotFoundException {
         readFiles(keyFile, docFile);
         calculate();
         return documents;
@@ -187,7 +190,7 @@ class DocSearch {
         }
     }
 
-    private void readFiles(String keyFile, String docFile) {
+    private void readFiles(String keyFile, String docFile) throws FileNotFoundException {
         keywords.clear();
         try {
             BufferedReader br = new BufferedReader(new FileReader(keyFile));
@@ -202,6 +205,7 @@ class DocSearch {
         } catch (FileNotFoundException e) {
             System.out.println("No keyword database available.");
             e.printStackTrace();
+            throw(e);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -224,6 +228,7 @@ class DocSearch {
         } catch (FileNotFoundException e) {
             System.out.println("No document database available.");
             e.printStackTrace();
+            throw(e);
         } catch (IOException e) {
             e.printStackTrace();
         }
