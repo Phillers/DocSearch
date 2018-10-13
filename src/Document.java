@@ -1,5 +1,5 @@
 import java.util.TreeMap;
-import javax.swing.*;
+
 class Document{
     String title;
     String content;

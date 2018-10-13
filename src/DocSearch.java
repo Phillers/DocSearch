@@ -1,18 +1,15 @@
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeMap;
+import java.util.Vector;
 
 class GUI implements Runnable{
     private DocSearch home;
@@ -22,10 +19,10 @@ class GUI implements Runnable{
 
     @Override
     public void run() {
-        JFrame jfrm = new JFrame("Document Search");
-        jfrm.setSize(1000, 600);
-        jfrm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        jfrm.setLayout(new GridBagLayout());
+        JFrame frame = new JFrame("Document Search");
+        frame.setSize(1000, 600);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLayout(new GridBagLayout());
         JLabel lbl1 = new JLabel("Keywords file:");
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
@@ -33,46 +30,45 @@ class GUI implements Runnable{
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 0.5;
         c.weighty = 1;
-        jfrm.add(lbl1, c);
+        frame.add(lbl1, c);
         JTextField jtx1 = new JTextField("keywords.txt");
         c.gridx = 1;
         c.weightx = 2;
-        jfrm.add(jtx1, c);
+        frame.add(jtx1, c);
         JLabel lbl2 = new JLabel("Documents file:");
         c.gridx = 2;
         c.weightx = 0.5;
-        jfrm.add(lbl2, c);
+        frame.add(lbl2, c);
         JTextField jtx2 = new JTextField("documents.txt");
         c.gridx = 3;
         c.weightx = 2;
-        jfrm.add(jtx2, c);
+        frame.add(jtx2, c);
         JButton btn1 = new JButton("Open");
         btn1.addActionListener(e -> getDatabase(jtx1.getText(), jtx2.getText()));
         c.gridx = 4;
         c.weightx = 0.5;
-        jfrm.add(btn1, c);
+        frame.add(btn1, c);
         JLabel lbl3 = new JLabel("Query text:");
         c.gridx = 5;
         c.weightx = 0.5;
-        jfrm.add(lbl3, c);
+        frame.add(lbl3, c);
         JTextField jtx3 = new JTextField("", 50);
         c.gridx = 6;
         c.weightx = 3;
-        jfrm.add(jtx3, c);
+        frame.add(jtx3, c);
         JButton btn2 = new JButton("Search");
         c.gridx = 7;
         c.weightx = 0.5;
         btn2.addActionListener(e -> search(jtx3.getText()));
-        jfrm.add(btn2, c);
+        frame.add(btn2, c);
         JScrollPane sp1 = new JScrollPane();
         c.weightx = 0;
         c.weighty = 3;
         c.gridx = 0;
         c.gridy = 1;
         c.gridwidth = 5;
-        //c.gridheight = 3;
         c.fill = GridBagConstraints.BOTH;
-        jfrm.add(sp1, c);
+        frame.add(sp1, c);
         table.setDefaultEditor(Object.class, null);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         ListSelectionModel selectionModel = table.getSelectionModel();
@@ -89,12 +85,12 @@ class GUI implements Runnable{
         c.gridwidth = 3;
         c.gridheight = 3;
         sp2.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        jfrm.add(sp2, c);
+        frame.add(sp2, c);
         content.setLineWrap(true);
         content.setWrapStyleWord(true);
         content.setEditable(false);
         sp2.getViewport().add(content);
-        jfrm.setVisible(true);
+        frame.setVisible(true);
     }
 
     private void search(String expression) {
@@ -132,7 +128,7 @@ class GUI implements Runnable{
         this.home = home;
     }
 }
-public class DocSearch {
+class DocSearch {
 
     private TreeMap<String, Double> keywords = new TreeMap<>();
     private Vector<Document> documents = new Vector<>();
