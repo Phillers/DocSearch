@@ -17,6 +17,10 @@ class GUI implements Runnable{
     private JTable table = new JTable();
     private JTextArea content = new JTextArea();
     private JFrame frame = new JFrame("Document Search");
+    private JLabel question = new JLabel("Do You want to search for extended phrase? ");
+    private JLabel extended = new JLabel("");
+    private JButton search2 = new JButton("Search extended");
+
     @Override
     public void run() {
         frame.setSize(1000, 600);
@@ -60,11 +64,23 @@ class GUI implements Runnable{
         c.weightx = 0.5;
         btn2.addActionListener(e -> search(jtx3.getText()));
         frame.add(btn2, c);
-        JScrollPane sp1 = new JScrollPane();
-        c.weightx = 0;
-        c.weighty = 3;
         c.gridx = 0;
         c.gridy = 1;
+        c.gridwidth = 2;
+        question.setVisible(false);
+        frame.add(question, c);
+        c.gridx = 2;
+        frame.add(extended, c);
+        c.gridx = 4;
+        c.gridwidth = 1;
+        search2.addActionListener(e -> search(extended.getText()));
+        search2.setVisible(false);
+        frame.add(search2, c);
+        JScrollPane sp1 = new JScrollPane();
+        c.weightx = 0;
+        c.weighty = 5;
+        c.gridx = 0;
+        c.gridy = 2;
         c.gridwidth = 5;
         c.fill = GridBagConstraints.BOTH;
         frame.add(sp1, c);
@@ -78,11 +94,12 @@ class GUI implements Runnable{
         });
         sp1.getViewport().add(table);
         JScrollPane sp2 = new JScrollPane();
+        c.weighty = 5;
         c.weightx = 0;
         c.gridx = 5;
-        c.gridy = 1;
+        c.gridy = 2;
         c.gridwidth = 3;
-        c.gridheight = 3;
+
         sp2.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         frame.add(sp2, c);
         content.setLineWrap(true);
@@ -94,6 +111,10 @@ class GUI implements Runnable{
 
     private void search(String expression) {
         documents = new ArrayList<>(home.search(expression));
+        question.setVisible(true);
+        extended.setText(expression + home.extension);
+        System.out.println(extended.getText());
+        search2.setVisible(true);
         DefaultTableModel model = new DefaultTableModel();
         model.addColumn("Document title");
         model.addColumn("Similarity");
@@ -135,6 +156,7 @@ class DocSearch {
 
     private TreeMap<String, Double> keywords = new TreeMap<>();
     private Vector<Document> documents = new Vector<>();
+    String extension;
 
     public static void main(String[] args) {
         DocSearch ds = new DocSearch();
@@ -151,6 +173,7 @@ class DocSearch {
         Vector<Document> res = new Vector<>();
         Document query = new Document();
         query.processContent(expression);
+        extension = query.title;
         query.calculateTF(keywords, 0);
         query.calculateTFIDF(keywords);
         for (Document doc : documents){

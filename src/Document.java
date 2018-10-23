@@ -2,6 +2,7 @@ import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.PointerUtils;
 import net.sf.extjwnl.dictionary.Dictionary;
 
+import java.util.NoSuchElementException;
 import java.util.TreeMap;
 
 class Document{
@@ -56,15 +57,19 @@ class Document{
         str = str.toLowerCase();
         str = str.replaceAll("[^\\p{IsAlphabetic}\\p{IsDigit} ]", "");
         String[] words = str.split(" ");
-//        if(title == null || title.length()<=1){
-//            for(String word : words){
-//                try {
-//                    //System.out.println(PointerUtils.getDirectHypernyms(dict.lookupAllIndexWords(word).getIndexWordArray()[0].getSenses().get(0)).getWord());
-//                } catch (JWNLException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }
+        if(title == null || title.length()<=1){
+            title = "";
+            for(String word : words){
+                try {
+                    title += " "+ PointerUtils.getDirectHypernyms(
+                            dict.lookupAllIndexWords(word).getIndexWordArray()[0].getSenses().get(0))
+                            .getFirst().getSynset().getWords().get(0).getLemma();
+                    System.out.println(title);
+                } catch (JWNLException | ArrayIndexOutOfBoundsException | NoSuchElementException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
         for(int i = 0 ; i < words.length; i++){
             Stemmer s = new Stemmer();
             s.add(words[i].toCharArray(), words[i].length());
