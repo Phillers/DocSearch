@@ -16,7 +16,7 @@ class GUI implements Runnable{
     private List<Document> documents;
     private JTable table = new JTable();
     private JTextArea content = new JTextArea();
-    JFrame frame = new JFrame("Document Search");
+    private JFrame frame = new JFrame("Document Search");
     @Override
     public void run() {
         frame.setSize(1000, 600);
@@ -106,7 +106,7 @@ class GUI implements Runnable{
 
     private void showDocument(int index) {
         try {
-            content.setText(documents.get(index).content);
+            content.setText(documents.get(index).content + "\n\n\n" + documents.get(index).processedContent);
         } catch(ArrayIndexOutOfBoundsException e){
             content.setText("");
         }

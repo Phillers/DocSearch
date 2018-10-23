@@ -1,12 +1,25 @@
+import net.sf.extjwnl.JWNLException;
+import net.sf.extjwnl.data.PointerUtils;
+import net.sf.extjwnl.dictionary.Dictionary;
+
 import java.util.TreeMap;
 
 class Document{
     String title;
     String content;
-    private String processedContent;
+    String processedContent;
     private TreeMap<String, Double> words = new TreeMap<>();
     private Double d;
     Double s;
+    private static Dictionary dict;
+
+    static {
+        try {
+            dict = Dictionary.getDefaultResourceInstance();
+        } catch (JWNLException e) {
+            e.printStackTrace();
+        }
+    }
 
     void calculateTF(TreeMap<String, Double> keywords, int change){
         String[] wordsArr = processedContent.split(" +");
@@ -43,10 +56,18 @@ class Document{
         str = str.toLowerCase();
         str = str.replaceAll("[^\\p{IsAlphabetic}\\p{IsDigit} ]", "");
         String[] words = str.split(" ");
+//        if(title == null || title.length()<=1){
+//            for(String word : words){
+//                try {
+//                    //System.out.println(PointerUtils.getDirectHypernyms(dict.lookupAllIndexWords(word).getIndexWordArray()[0].getSenses().get(0)).getWord());
+//                } catch (JWNLException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
         for(int i = 0 ; i < words.length; i++){
             Stemmer s = new Stemmer();
             s.add(words[i].toCharArray(), words[i].length());
-
             s.stem();
             words[i] = s.toString();
         }
