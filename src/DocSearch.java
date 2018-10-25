@@ -2,6 +2,8 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -11,7 +13,7 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
 
-class GUI implements Runnable{
+class GUI implements Runnable {
     private DocSearch home;
     private List<Document> documents;
     private JTable table = new JTable();
@@ -73,7 +75,15 @@ class GUI implements Runnable{
         frame.add(extended, c);
         c.gridx = 4;
         c.gridwidth = 1;
-        search2.addActionListener(e -> search(extended.getText()));
+        search2.addActionListener(e -> {
+            jtx3.setText(extended.getText());
+            search(extended.getText());
+            jtx3.setText(extended.getText());
+            question.setVisible(false);
+            extended.setVisible(false);
+            search2.setVisible(false);
+
+        });
         search2.setVisible(false);
         frame.add(search2, c);
         JScrollPane sp1 = new JScrollPane();
@@ -88,8 +98,8 @@ class GUI implements Runnable{
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         ListSelectionModel selectionModel = table.getSelectionModel();
         selectionModel.addListSelectionListener(e -> {
-            if(!e.getValueIsAdjusting()) {
-                showDocument(((ListSelectionModel)e.getSource()).getMinSelectionIndex());
+            if (!e.getValueIsAdjusting()) {
+                showDocument(((ListSelectionModel) e.getSource()).getMinSelectionIndex());
             }
         });
         sp1.getViewport().add(table);
@@ -113,12 +123,12 @@ class GUI implements Runnable{
         documents = new ArrayList<>(home.search(expression));
         question.setVisible(true);
         extended.setText(expression + home.extension);
-        System.out.println(extended.getText());
+        extended.setVisible(true);
         search2.setVisible(true);
         DefaultTableModel model = new DefaultTableModel();
         model.addColumn("Document title");
         model.addColumn("Similarity");
-        for ( Document doc : documents) {
+        for (Document doc : documents) {
             model.addRow(new Object[]{doc.title, doc.s});
         }
         table.setModel(model);
@@ -128,7 +138,7 @@ class GUI implements Runnable{
     private void showDocument(int index) {
         try {
             content.setText(documents.get(index).content + "\n\n\n" + documents.get(index).processedContent);
-        } catch(ArrayIndexOutOfBoundsException e){
+        } catch (ArrayIndexOutOfBoundsException e) {
             content.setText("");
         }
     }
@@ -142,16 +152,17 @@ class GUI implements Runnable{
                 model.addRow(new Object[]{doc.title});
             }
             table.setModel(model);
-        } catch (FileNotFoundException e){
+        } catch (FileNotFoundException e) {
             JOptionPane.showMessageDialog(frame, e.getMessage());
         }
     }
 
 
-    GUI(DocSearch home){
+    GUI(DocSearch home) {
         this.home = home;
     }
 }
+
 class DocSearch {
 
     private TreeMap<String, Double> keywords = new TreeMap<>();
@@ -176,7 +187,7 @@ class DocSearch {
         extension = query.title;
         query.calculateTF(keywords, 0);
         query.calculateTFIDF(keywords);
-        for (Document doc : documents){
+        for (Document doc : documents) {
             doc.calculateSimilarity(query);
             addToResultSet(res, doc);
         }
@@ -184,9 +195,9 @@ class DocSearch {
     }
 
     private void addToResultSet(Vector<Document> set, Document doc) {
-        if(doc.s > 0 && set.size()>0 ){
-            for(int i=0; i<set.size(); i++){
-                if(doc.s > set.elementAt(i).s){
+        if (doc.s > 0 && set.size() > 0) {
+            for (int i = 0; i < set.size(); i++) {
+                if (doc.s > set.elementAt(i).s) {
                     set.insertElementAt(doc, i);
                     return;
                 }
@@ -203,12 +214,12 @@ class DocSearch {
     }
 
     private void calculate() {
-        for (Document doc : documents){
-            doc.calculateTF(keywords,1);
+        for (Document doc : documents) {
+            doc.calculateTF(keywords, 1);
         }
         int count = documents.size();
-        keywords.replaceAll((k, v) -> Math.log10(count/v));
-        for (Document doc : documents){
+        keywords.replaceAll((k, v) -> Math.log10(count / v));
+        for (Document doc : documents) {
             doc.calculateTFIDF(keywords);
         }
     }
@@ -228,7 +239,7 @@ class DocSearch {
         } catch (FileNotFoundException e) {
             System.out.println("No keyword database available.");
             e.printStackTrace();
-            throw(e);
+            throw (e);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -242,7 +253,7 @@ class DocSearch {
                 doc.title = str.toString();
                 str.append('\n');
                 String str2;
-                while(br.ready() &&(str2 = br.readLine().trim()).length() >0){
+                while (br.ready() && (str2 = br.readLine().trim()).length() > 0) {
                     str.append(' ').append(str2);
                 }
                 doc.processContent(str.toString());
@@ -251,7 +262,7 @@ class DocSearch {
         } catch (FileNotFoundException e) {
             System.out.println("No document database available.");
             e.printStackTrace();
-            throw(e);
+            throw (e);
         } catch (IOException e) {
             e.printStackTrace();
         }
